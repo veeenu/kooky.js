@@ -1,18 +1,29 @@
+/**
+ * Kooky.js
+ * Copyright (C) 2013 Andrea Venuta (http://github.com/veeenu)
+ */
 (function() {
 
+  /**
+   * If the document hasn't already been created, return, wait for the
+   * window to be loaded and run again.
+   */
   if(document.body == null) {
     window.onload = arguments.callee;
     return;
   }
 
+  // Create an unique ID
   var containerID = '__veeenu_kooky' + (new Date()).getTime();
   
+  // Create the fundamental DOM elements
   var container = document.createElement('div');
   container.id = containerID;
-  console.log(container.constructor);
+  
   var table = document.createElement('table');
   container.appendChild(table);
 
+  // Create a stylesheet
   var style = document.createElement('style');
   style.appendChild(document.createTextNode(''));
   document.head.appendChild(style);
@@ -21,7 +32,7 @@
     'position: fixed !important; border-radius: 2px !important; z-index: 4294967296;'+
     'background-color: rgba(33, 33, 33, 0.9) !important; top: 16px !important; right: 16px !important;'+
     'position: fixed !important; width: 240px !important; height: 120px !important; overflow-y: scroll !important;'+
-    'overflow-x: hidden !important;'+
+    'overflow-x: hidden !important;, display: block; opacity: 1; visibility: visible;'+
     'font-family: "Menlo", courier, monospace !important;');
   style.sheet.addRule('#' + containerID + ' a.close',
     'position: fixed !important; top: 8px !important; right: 8px !important; height: 16px !important; width: 16px !important;'+
@@ -40,13 +51,20 @@
     'background: rgba(33, 33, 33, 0.6) !important;'+
     'padding: 0 0.3em !important; line-height: 1.5em !important; font-size: 12px !important; border-radius: 2px !important;');
 
+  /**
+   * This is the common behavior for input boxes representing keys.
+   * We delete the cookie named like the previous value of the field
+   * and create a new one named like the new value of the field.
+   */
   var keyInChangeListener = (function(ki, vi) { return function(evt) {
       
     evt.preventDefault();
     evt.stopPropagation();
 
+    // Delete the old cookie
     document.cookie = ki.oldValue + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 
+    // If there are sound values, set a new cookie, else ignore and remove the row
     if(vi.value != '' && ki.value != '') {
       document.cookie = ki.value + '=' + vi.value;
     } else {
@@ -59,6 +77,11 @@
 
   }});
 
+  /**
+   * This is the common behavior for input boxes representing cookie values.
+   * Set the new value for the specified key if it's not empty, remove the
+   * cookie otherwise.
+   */
   var valInChangeListener = (function(ki, vi) { return function(evt) {
     
     if(vi.value != '' && ki.value != '') {
@@ -71,6 +94,9 @@
 
   }});
 
+  /**
+   * Create a new row (hence a new cookie)
+   */
   var createRow = function(key, value) {
     var tr = document.createElement('tr');
       var td1 = document.createElement('td');
@@ -86,6 +112,7 @@
       tr.appendChild(td1);
       tr.appendChild(td2);
 
+    // Append the common event listeners
     keyIn.addEventListener('focus', function(evt) {
       this.oldValue = this.value;
     });
@@ -95,7 +122,7 @@
     return tr;
   }
 
-  
+  // Create the closing button
   var close = document.createElement('a');
   close.className = 'close';
   close.appendChild(document.createTextNode("\u00D7"));
@@ -106,6 +133,7 @@
   });
   container.appendChild(close);
 
+  // Parse the cookies
   var cookies = document.cookie.split(';');
   for(var i in cookies) {
     cookies[i] = cookies[i].trim();
@@ -114,6 +142,7 @@
     table.appendChild(createRow(key, val));
   }
 
+  // Isolate the table initialization in a closure
   (function(table) {
     var tr = document.createElement('tr');
       var td1 = document.createElement('td');
@@ -130,6 +159,7 @@
       tr.appendChild(td2);
     table.appendChild(tr);
 
+    // Listen to `enter` keypresses, same behavior for both inputs.
     var enterListener = (function(ki, vi, tr, table) { return function(evt) {
 
       if(evt.which == 13) {
