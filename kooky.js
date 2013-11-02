@@ -3,12 +3,12 @@
  * Copyright (C) 2013 Andrea Venuta (http://github.com/veeenu)
  */
 (function() {
-
+'use strict' // JSHint
   /**
    * If the document hasn't already been created, return, wait for the
    * window to be loaded and run again.
    */
-  if(document.body == null) {
+  if(document.body === null) { // strict comparison.
     window.onload = arguments.callee;
     return;
   }
@@ -65,13 +65,14 @@
     document.cookie = ki.oldValue + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 
     // If there are sound values, set a new cookie, else ignore and remove the row
-    if(vi.value != '' && ki.value != '') {
+    if(vi.value !== '' && ki.value !== '') { // Strict comparison
       document.cookie = ki.value + '=' + vi.value;
     } else {
       var tr = ki.parentNode.parentNode;
       try { 
         tr.parentNode.removeChild(tr); 
       } catch(exc) {
+        console.warn(exc);
       }
     }
 
@@ -84,7 +85,7 @@
    */
   var valInChangeListener = (function(ki, vi) { return function(evt) {
     
-    if(vi.value != '' && ki.value != '') {
+    if(vi.value !== '' && ki.value !== '') {
       document.cookie = ki.value + '=' + vi.value;
     } else {
       document.cookie = ki.oldValue + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
@@ -162,7 +163,7 @@
     // Listen to `enter` keypresses, same behavior for both inputs.
     var enterListener = (function(ki, vi, tr, table) { return function(evt) {
 
-      if(evt.which == 13) {
+      if(evt.which === 13) {
         document.cookie = ki.value + '=' + vi.value;
         table.insertBefore(createRow(ki.value, vi.value), tr);
         ki.value = vi.value = '';
